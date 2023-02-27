@@ -1,2 +1,3 @@
 # Project-HIVELocity
-A time bank and social exchange based on Hive web 3.0.
+The purpose of this project is to develop dapps, that
+extend the utility of Hive ecosystem.
