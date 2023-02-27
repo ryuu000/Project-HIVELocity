@@ -1,1 +1,119 @@
+Backend
+
+
+
+from flask import Flask, render_template, request, redirect, url_for, session
+
+from hiveengine.wallet import Wallet
+
+from beem import Hive
+
+
+app = Flask(__name__)
+
+app.secret_key = 'your-secret-key'
+
+
+# Connect to Hive
+
+hive = Hive(node='https://api.hive.blog')
+
+wallet = Wallet('your-hive-username', 'ssc-mainnet-hive', hive)
+
+
+# Homepage
+
+@app.route('/')
+
+def index():
+
+    # Get featured NFTs from database
+
+    featured_nfts = [
+
+        {
+
+            'title': 'NFT Title 1',
+
+            'image': 'nft-image-1.jpg',
+
+            'description': 'NFT Description 1',
+
+            'price': 1.0,
+
+            'symbol': 'SWAP.HIVE'
+
+        },
+
+        {
+
+            'title': 'NFT Title 2',
+
+            'image': 'nft-image-2.jpg',
+
+            'description': 'NFT Description 2',
+
+            'price': 2.0,
+
+            'symbol': 'SWAP.HIVE'
+
+        }
+
+    ]
+
+    return render_template('index.html', nfts=featured_nfts)
+
+
+# Buy NFT page
+
+@app.route('/buy-nft/<int:nft_id>')
+
+def buy_nft(nft_id):
+
+    # Get NFT details from database
+
+    nft = {
+
+        'title': 'NFT Title 1',
+
+        'image': 'nft-image-1.jpg',
+
+        'description': 'NFT Description 1',
+
+        'price': 1.0,
+
+        'symbol': 'SWAP.HIVE'
+
+    }
+
+    return render_template('buy-nft.html', nft=nft)
+
+
+# Process payment
+
+@app.route('/process-payment', methods=['POST'])
+
+def process_payment():
+
+    amount = request.form['amount']
+
+    symbol = request.form['symbol']
+
+    nft_id = request.form['nft_id']
+
+    # Verify payment and transfer NFT to buyer
+
+    if wallet.transfer('your-nft-seller', amount, symbol, memo=nft_id):
+
+        return redirect(url_for('index'))
+
+    else:
+
+        return 'Payment failed'
+
+
+if __name__ == '__main__':
+
+    app.run(debug=True)
+
 
