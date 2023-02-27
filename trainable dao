@@ -1,0 +1,62 @@
+A Dedicated DAO for training and bartering A.I enabled services  and products:
+
+
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.0;
+
+
+contract AI_Training_DAO {
+
+  struct Member {
+
+    bool exists;
+
+    uint256 contribution;
+
+  }
+
+
+  mapping(address => Member) public members;
+
+
+  function join() public {
+
+    require(!members[msg.sender].exists, "Already a member.");
+
+    members[msg.sender] = Member(true, 0);
+
+  }
+
+
+  function contribute(uint256 _amount) public {
+
+    require(members[msg.sender].exists, "Not a member.");
+
+    members[msg.sender].contribution += _amount;
+
+  }
+
+
+  function trainAI() public view returns (bool) {
+
+    uint256 totalContribution = 0;
+
+    for (uint256 i = 0; i < members.length; i++) {
+
+      if (members[i].exists) {
+
+        totalContribution += members[i].contribution;
+
+      }
+
+    }
+
+    return totalContribution >= 1000;
+
+  }
+
+}
+
+
+
