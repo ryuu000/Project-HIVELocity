@@ -1,1 +1,253 @@
+Neural network ( A.I for barter prediction )
+
+
+
+
+
+import tensorflow as tf
+
+
+# Define the neural network architecture
+
+model = tf.keras.models.Sequential([
+
+    tf.keras.layers.Dense(64, activation='relu', input_shape=(num_features,)),
+
+    tf.keras.layers.Dense(64, activation='relu'),
+
+    tf.keras.layers.Dense(1)
+
+])
+
+
+# Compile the neural network
+
+model.compile(optimizer='adam', loss='mse')
+
+
+# Train the neural network on the training data
+
+model.fit(train_data, train_labels, epochs=10, batch_size=32)
+
+
+# Evaluate the neural network on the test data
+
+test_loss = model.evaluate(test_data, test_labels)
+
+
+
+
+NN prediction game simulation ( barter )
+
+
+import numpy as np
+
+from keras.models import Sequential
+
+from keras.layers import Dense
+
+
+# define input, hidden, and output layer sizes
+
+input_layer_size = 2
+
+hidden_layer_size = 3
+
+output_layer_size = 1
+
+
+# generate random input data
+
+X = np.random.rand(100, input_layer_size)
+
+
+# define the model
+
+model = Sequential()
+
+model.add(Dense(hidden_layer_size, input_dim=input_layer_size, activation='relu'))
+
+model.add(Dense(output_layer_size, activation='sigmoid'))
+
+
+# compile the model
+
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+
+# train the model
+
+y = np.random.randint(2, size=100)
+
+model.fit(X, y, epochs=100, batch_size=10)
+
+
+# start the game
+
+while True:
+
+    input_data = np.random.rand(input_layer_size)
+
+    prediction = model.predict(np.array([input_data]))
+
+    prediction_category = int(np.round(prediction))
+
+    user_guess = input(f"Predict whether {input_data} is in category 0 or 1: ")
+
+    if int(user_guess) == prediction_category:
+
+        print("Congratulations! Your prediction was correct.")
+
+    else:
+
+        print("Sorry, your prediction was incorrect.")
+
+
+
+
+A trainable example of AI for synthetic data:
+
+
+
+
+import tensorflow as tf
+
+from tensorflow import keras
+
+
+# Load the dataset
+
+(x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+
+
+# Normalize the data
+
+x_train = x_train / 255.0
+
+x_test = x_test / 255.0
+
+
+# Define the model architecture
+
+model = keras.Sequential([
+
+    keras.layers.Flatten(input_shape=(28, 28)),
+
+    keras.layers.Dense(128, activation='relu'),
+
+    keras.layers.Dense(10)
+
+])
+
+
+# Compile the model
+
+model.compile(optimizer='adam',
+
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+
+              metrics=['accuracy'])
+
+
+# Train the model
+
+model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test))
+
+
+# Evaluate the model
+
+test_loss, test_acc = model.evaluate(x_test, y_test, verbose=2)
+
+print('\nTest accuracy:', test_acc)
+
+
+
+For video:
+
+
+
+import cv2
+
+import numpy as np
+
+import tensorflow as tf
+
+from tensorflow import keras
+
+
+# Load the model architecture
+
+model = keras.Sequential([
+
+    keras.layers.Flatten(input_shape=(28, 28)),
+
+    keras.layers.Dense(128, activation='relu'),
+
+    keras.layers.Dense(10)
+
+])
+
+
+# Load the pre-trained model weights
+
+model.load_weights('model_weights.h5')
+
+
+# Load the video
+
+cap = cv2.VideoCapture('video.mp4')
+
+
+# Loop over each frame in the video
+
+while(cap.isOpened()):
+
+    ret, frame = cap.read()
+
+    if ret == True:
+
+        # Preprocess the frame
+
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        gray_resized = cv2.resize(gray, (28, 28))
+
+        normalized = gray_resized / 255.0
+
+        
+
+        # Make a prediction
+
+        prediction = model.predict(np.array([normalized]))
+
+        digit = np.argmax(prediction)
+
+        
+
+        # Display the digit on the frame
+
+        cv2.putText(frame, str(digit), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+
+        cv2.imshow('frame', frame)
+
+        
+
+        # Press 'q' to quit
+
+        if cv2.waitKey(25) & 0xFF == ord('q'):
+
+            break
+
+    else:
+
+        break
+
+
+# Release the resources
+
+cap.release()
+
+cv2.destroyAllWindows()
+
+
 
