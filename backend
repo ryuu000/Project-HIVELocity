@@ -117,3 +117,17 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
+
+
+Backend modified
+
+
+
+from flask import Flask, request, jsonify
+
+from hiveengine.wallet import Wallet
+
+
+
+
+
