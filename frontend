@@ -1,7 +1,3 @@
-Frontend 
-
-
-
 <!DOCTYPE html>
 
 <html>
@@ -20,49 +16,93 @@ Frontend 
 
     <form>
 
-      <input type="text" placeholder="Search NFTs">
+      <input type="text" placeholder="Search NFTs" id="search-input">
 
-      <button type="submit">Search</button>
+      <button type="button" onclick="searchNFTs()">Search</button>
 
     </form>
 
     <h2>Featured NFTs</h2>
 
-    <ul>
-
-      <li>
-
-        <h3>NFT Title 1</h3>
-
-        <img src="nft-image-1.jpg" alt="NFT Image 1">
-
-        <p>NFT Description 1</p>
-
-        <p>Price: X ETH</p>
-
-        <button>Buy Now</button>
-
-      </li>
-
-      <li>
-
-        <h3>NFT Title 2</h3>
-
-        <img src="nft-image-2.jpg" alt="NFT Image 2">
-
-        <p>NFT Description 2</p>
-
-        <p>Price: Y ETH</p>
-
-        <button>Buy Now</button>
-
-      </li>
+    <ul id="featured-nfts">
 
     </ul>
+
+
+    <script>
+
+      function searchNFTs() {
+
+        const searchInput = document.getElementById('search-input').value;
+
+        fetch(`http://localhost:5000/search-nfts?q=${searchInput}`)
+
+          .then(response => response.json())
+
+          .then(data => {
+
+            const featuredNFTs = document.getElementById('featured-nfts');
+
+            featuredNFTs.innerHTML = '';
+
+            data.forEach(nft => {
+
+              const li = document.createElement('li');
+
+              li.innerHTML = `
+
+                <h3>${nft.title}</h3>
+
+                <img src="${nft.image}" alt="${nft.title}">
+
+                <p>${nft.description}</p>
+
+                <p>Price: ${nft.price} ${nft.symbol}</p>
+
+                <button onclick="buyNFT(${nft.id})">Buy Now</button>
+
+              `;
+
+              featuredNFTs.appendChild(li);
+
+            });
+
+          })
+
+          .catch(error => console.error(error));
+
+      }
+
+
+      function buyNFT(nftId) {
+
+        fetch(`http://localhost:5000/buy-nft/${nftId}`)
+
+          .then(response => response.json())
+
+          .then(data => {
+
+            // Redirect to payment page
+
+            window.location.href = `/payment?amount=${data.price}&symbol=${data.symbol}&nft_id=${data.id}`;
+
+          })
+
+          .catch(error => console.error(error));
+
+      }
+
+    </script>
 
   </body>
 
 </html>
+
+
+
+    
+
+      
 
 
 
