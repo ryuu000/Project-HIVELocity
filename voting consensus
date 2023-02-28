@@ -1,1 +1,88 @@
 
+import requests
+import json
+import time
+
+# Define the API endpoint for Hivesigner
+HIVESIGNER_API = 'https://hivesigner.com/api/'
+
+# Define the API endpoint for the Internet Computer
+ICP_API = 'https://ic-api.internetcomputer.org/api/v2/'
+
+# Define the address of the voting contract on the Internet Computer
+VOTING_CONTRACT_ADDRESS = '...'
+
+# Define the account credentials for the DAO administrator
+ADMIN_USERNAME = '...'
+ADMIN_POSTING_KEY = '...'
+
+# Define the minimum number of votes required for a proposal to be approved
+MIN_VOTES = 3
+
+# Define the duration of each voting period (in seconds)
+VOTING_PERIOD_DURATION = 86400  # 24 hours
+
+# Define the initial proposal data
+proposal_data = {
+    'title': 'Proposal Title',
+    'description': 'Proposal Description',
+    'options': ['Option 1', 'Option 2', 'Option 3'],
+    'start_time': int(time.time()),
+    'end_time': int(time.time()) + VOTING_PERIOD_DURATION,
+    'votes': {
+        'Option 1': 0,
+        'Option 2': 0,
+        'Option 3': 0
+    }
+}
+
+# Define a function to create a new proposal
+def create_proposal(data):
+    # Encode the proposal data as a JSON string
+    data_str = json.dumps(data)
+    
+    # Create a new transaction on Hivesigner to call the 'create_proposal' function on the voting contract
+    tx_data = {
+        'id': 'ssc-mainnet-hive',
+        'json': data_str,
+        'required_auths': [ADMIN_USERNAME],
+        'required_posting_auths': [],
+        'method': 'custom_json',
+        'params': ['create_proposal', data_str],
+        'extensions': []
+    }
+    
+    # Sign the transaction with the administrator's posting key using Hivesigner's API
+    res = requests.post(HIVESIGNER_API + 'broadcast', data=tx_data, auth=(ADMIN_USERNAME, ADMIN_POSTING_KEY))
+    
+    # Print the transaction ID and result
+    print(res.json())
+
+# Define a function to vote on a proposal
+def vote(proposal_id, option):
+    # Create a new transaction on Hivesigner to call the 'vote' function on the voting contract
+    tx_data = {
+        'id': 'ssc-mainnet-hive',
+        'json': json.dumps({'proposal_id': proposal_id, 'option': option}),
+        'required_auths': [ADMIN_USERNAME],
+        'required_posting_auths': [],
+        'method': 'custom_json',
+        'params': ['vote', json.dumps({'proposal_id': proposal_id, 'option': option})],
+        'extensions': []
+    }
+    
+    # Sign the transaction with the administrator's posting key using Hivesigner's API
+    res = requests.post(HIVESIGNER_API + 'broadcast', data=tx_data, auth=(ADMIN_USERNAME, ADMIN_POSTING_KEY))
+    
+    # Print the transaction ID and result
+    print(res.json())
+
+# Define a function to get the current results of a proposal
+def get_results(proposal_id):
+    # Send a GET request to the voting contract on the Internet Computer to retrieve the proposal data
+    res = requests.get(ICP_API + VOTING_CONTRACT_ADDRESS + '/' + str(proposal_id))
+    
+    # Decode the JSON response and return the proposal data
+    return json.loads(res.text)
+
+# Define a function to check if a proposal has
