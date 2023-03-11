@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Project HIVElocity</title>
+</head>
+<body>
+	<button id="myButton">Click Me!</button>
+
+	<script>
+		// Add an event listener to the button
+		document.getElementById("myButton").addEventListener("click", function(){
+			// Perform an action when the button is clicked
+			alert("Hello, World!");
+		});
+	</script>
+</body>
+</html>
