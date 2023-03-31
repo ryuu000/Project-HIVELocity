@@ -1,1 +1,44 @@
 
+pragma solidity ^0.8.0;
+
+contract PredictionMarket {
+    uint[] prices;
+    string[] outcomes;
+    address owner;
+
+    constructor(string[] memory _outcomes, uint _initialFunds) {
+        require(_outcomes.length > 0, "Must have at least one outcome");
+        outcomes = _outcomes;
+        prices = new uint[](outcomes.length);
+        uint price = _initialFunds / outcomes.length;
+        for (uint i = 0; i < outcomes.length; i++) {
+            prices[i] = price;
+        }
+        owner = msg.sender;
+    }
+
+    function buy(uint outcomeIdx, uint amount) external payable {
+        require(outcomeIdx < outcomes.length, "Invalid outcome index");
+        require(msg.value == amount, "Amount must match value sent");
+        uint price = prices[outcomeIdx];
+        prices[outcomeIdx] += amount / (2 * price);
+    }
+
+    function sell(uint outcomeIdx, uint amount) external {
+        require(outcomeIdx < outcomes.length, "Invalid outcome index");
+        uint price = prices[outcomeIdx];
+        prices[outcomeIdx] -= amount / (2 * price);
+        payable(msg.sender).transfer(amount);
+    }
+
+    function payout(uint winningOutcomeIdx) external {
+        require(msg.sender == owner, "Only owner can payout");
+        require(winningOutcomeIdx < outcomes.length, "Invalid winning outcome index");
+        uint totalFunds = address(this).balance;
+        uint payoutFactor = totalFunds / prices[winningOutcomeIdx];
+        for (uint i = 0; i < outcomes.length; i++) {
+            uint payoutAmount = payoutFactor * prices[i];
+            payable(msg.sender).transfer(payoutAmount);
+        }
+    }
+}
