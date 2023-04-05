@@ -1,0 +1,63 @@
+import cv2
+import numpy as np
+from web3 import Web3
+import json
+
+# Load the ABI and contract address for the smart contract
+with open('contract_abi.json') as f:
+    contract_abi = json.load(f)
+
+contract_address = '0x123456789abcdef'
+
+# Connect to the blockchain node
+w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
+
+# Load the contract and get the contract instance
+contract = w3.eth.contract(address=contract_address, abi=contract_abi)
+
+# Load the marker image
+marker = cv2.imread('marker.jpg')
+
+# Set up the detector and matcher
+detector = cv2.ORB_create()
+matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+kp_marker, des_marker = detector.detectAndCompute(marker, None)
+
+# Load the video feed from the camera
+cap = cv2.VideoCapture(0)
+
+while True:
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+
+    # Convert the frame to grayscale
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Find keypoints and descriptors in the grayscale frame
+    kp_frame, des_frame = detector.detectAndCompute(gray, None)
+
+    # Match the descriptors of the marker and the frame
+    matches = matcher.match(des_marker, des_frame)
+    matches = sorted(matches, key=lambda x:x.distance)
+
+    # Draw the matches
+    img_matches = cv2.drawMatches(marker, kp_marker, frame, kp_frame, matches[:10], None, flags=2)
+
+    # Display the resulting image
+    cv2.imshow('AR', img_matches)
+
+    # Store the data on the blockchain
+    data = {
+        'frame': frame.tolist(),
+        'matches': [match.distance for match in matches]
+    }
+
+    contract.functions.addData(json.dumps(data)).transact()
+
+    # Wait for a key press and exit if 'q' is pressed
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# Release the video capture and close all windows
+cap.release()
+cv2.destroyAllWindows()
