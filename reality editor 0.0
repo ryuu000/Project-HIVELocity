@@ -1,0 +1,46 @@
+import cv2
+import numpy as np
+import pyar
+
+# Load the marker image
+marker = cv2.imread('marker.jpg')
+
+# Load the 3D model
+model = pyar.Model('cube.obj')
+
+# Initialize the PyAR library
+ar = pyar.PyAR()
+
+# Define the marker
+ar.add_marker(marker)
+
+# Create the AR scene
+while True:
+    # Capture a frame from the camera
+    ret, frame = cap.read()
+
+    # Detect the marker in the frame
+    ids, corners = ar.detect_markers(frame)
+
+    # If a marker is detected, overlay the 3D model on the marker
+    if len(ids) > 0:
+        for i in range(len(ids)):
+            # Calculate the pose of the marker
+            rvec, tvec = ar.estimate_pose(ids[i], corners[i])
+
+            # Project the 3D model onto the marker
+            projection = ar.project_model(model, rvec, tvec)
+
+            # Draw the projected model on the frame
+            frame = ar.draw_model(frame, projection)
+
+    # Show the frame
+    cv2.imshow('AR', frame)
+
+    # Exit if the user presses the 'q' key
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# Clean up
+cap.release()
+cv2.destroyAllWindows()
